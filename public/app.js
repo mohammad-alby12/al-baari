@@ -21,6 +21,7 @@ function renderSchedule(){$("#dayTabs").innerHTML=days.map(d=>`<button class="da
 function page(name){$$(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+name));$$(".nav-link").forEach(a=>a.classList.toggle("active",a.dataset.page===name));$("#crumbPage").textContent=name.toUpperCase();if(name==="jadwal"&&!days.includes(activeDay))activeDay="Senin";window.scrollTo({top:0,behavior:"smooth"})}
 document.addEventListener("click",e=>{const a=e.target.closest("[data-page]");if(a){e.preventDefault();page(a.dataset.page);history.replaceState(null,"","#"+a.dataset.page)}});
 $("#adminOpen").onclick=()=>{$("#adminModal").classList.remove("hidden");$("#adminPin").focus()};
+$("#adminOpenMobile").onclick=()=>{$("#adminModal").classList.remove("hidden");$("#adminPin").focus()};
 $("#adminClose").onclick=()=>$("#adminModal").classList.add("hidden");$("#adminModal").onclick=e=>{if(e.target.id==="adminModal")$("#adminModal").classList.add("hidden")};
 $("#loginBtn").onclick=async()=>{adminPin=$("#adminPin").value;try{await api("/admin/login",{method:"POST",body:JSON.stringify({pin:adminPin})});$("#loginPane").classList.add("hidden");$("#managePane").classList.remove("hidden");adminTab="homework";renderAdmin()}catch(e){adminPin="";$("#loginError").textContent=e.message}};
 $("#logoutBtn").onclick=()=>{adminPin="";$("#managePane").classList.add("hidden");$("#loginPane").classList.remove("hidden");$("#adminPin").value=""};
