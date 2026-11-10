@@ -15,9 +15,10 @@ CREATE TABLE IF NOT EXISTS homework (id INTEGER PRIMARY KEY AUTOINCREMENT, subje
 CREATE TABLE IF NOT EXISTS schedule (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, time TEXT NOT NULL, subject TEXT NOT NULL, room TEXT DEFAULT '');
 CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, no INTEGER DEFAULT 0);
-CREATE TABLE IF NOT EXISTS homework_done (homework_id INTEGER NOT NULL, student_id INTEGER NOT NULL, done INTEGER DEFAULT 1, PRIMARY KEY(homework_id, student_id));
+CREATE TABLE IF NOT EXISTS homework_done (homework_id INTEGER NOT NULL, student_id INTEGER NOT NULL, done INTEGER DEFAULT 1, checked_at TEXT DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(homework_id, student_id));
 CREATE TABLE IF NOT EXISTS duty (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, members TEXT NOT NULL);
 `);
+if (!db.prepare("PRAGMA table_info(homework_done)").all().some(c => c.name === "checked_at")) db.exec("ALTER TABLE homework_done ADD COLUMN checked_at TEXT");
 const defaults = {
  className: "KELAS 6 AL BAARI", schoolYear: "TAHUN AJARAN 2026 / 2027",
  developer: "Alby", motto: "Belajar hari ini, bersinar esok hari.",
@@ -42,13 +43,17 @@ if (!db.prepare("SELECT COUNT(*) n FROM schedule").get().n) {
 const getSettings = () => Object.fromEntries(db.prepare("SELECT key,value FROM settings").all().map(x=>[x.key,x.value]));
 app.get("/api/data", (req,res) => {
  const homework = db.prepare("SELECT * FROM homework ORDER BY due,id").all();
- const doneRows = db.prepare("SELECT homework_id, student_id FROM homework_done WHERE done=1").all();
+ const doneRows = db.prepare("SELECT homework_id, student_id, checked_at FROM homework_done WHERE done=1").all();
  const doneMap = {};
  doneRows.forEach(r => { (doneMap[r.homework_id] ??= []).push(r.student_id); });
  homework.forEach(h => { h.doneBy = doneMap[h.id] || []; });
+ const statRows = db.prepare("SELECT student_id, COUNT(*) got, MAX(checked_at) lastAt FROM homework_done WHERE done=1 GROUP BY student_id").all();
+ const statMap = {};
+ statRows.forEach(r => { statMap[r.student_id] = { got:r.got, lastAt:r.lastAt }; });
+ const students = db.prepare("SELECT * FROM students ORDER BY no,id").all().map(s => ({ ...s, got:(statMap[s.id]||{}).got||0, lastAt:(statMap[s.id]||{}).lastAt||null }));
  res.json({
  settings:getSettings(),
- students:db.prepare("SELECT * FROM students ORDER BY no,id").all(),
+ students,
  homework,
  schedule:db.prepare("SELECT * FROM schedule ORDER BY CASE day WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 ELSE 6 END,time").all(),
  duty:db.prepare("SELECT * FROM duty ORDER BY CASE day WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END,id").all(),
@@ -84,7 +89,7 @@ app.put("/api/homework/:id/check",(req,res)=>{
  const hw=db.prepare("SELECT id FROM homework WHERE id=?").get(req.params.id);
  if(!student||!hw) return res.status(400).json({error:"Data siswa atau PR tidak ditemukan."});
  if(done){
- db.prepare("INSERT INTO homework_done(homework_id,student_id,done) VALUES(?,?,1) ON CONFLICT(homework_id,student_id) DO UPDATE SET done=1").run(req.params.id,studentId);
+ db.prepare("INSERT INTO homework_done(homework_id,student_id,done,checked_at) VALUES(?,?,1,CURRENT_TIMESTAMP) ON CONFLICT(homework_id,student_id) DO UPDATE SET done=1, checked_at=CURRENT_TIMESTAMP").run(req.params.id,studentId);
  } else {
  db.prepare("DELETE FROM homework_done WHERE homework_id=? AND student_id=?").run(req.params.id,studentId);
  }
