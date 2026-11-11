@@ -25,4 +25,38 @@
 <footer><span>© <span id="year"></span> KELAS 6 AL BAARI</span><span>MADE WITH PURPOSE BY <b id="devName">ALBY</b></span></footer>
 </main></div>
 <button class="admin-fab" id="adminOpenMobile" aria-label="Panel pengelola"><svg viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2zM8 9V6a4 4 0 1 1 8 0v3"/></svg></button><div class="modal-backdrop hidden" id="adminModal"><div class="modal"><button class="modal-close" id="adminClose">×</button><span class="eyebrow">CLASS MANAGEMENT</span><h2>Panel <em>pengelola.</em></h2><p class="muted">Kelola konten kelas dari satu tempat.</p><div id="loginPane"><label>PIN pengelola</label><input id="adminPin" type="password" inputmode="numeric" placeholder="Masukkan PIN"><button class="primary-btn" id="loginBtn">Masuk ke panel <span>↗</span></button><small class="form-error" id="loginError"></small></div><div id="managePane" class="hidden"><div class="admin-tabs"><button class="selected" data-admin-tab="homework">PR</button><button data-admin-tab="schedule">Jadwal</button><button data-admin-tab="duty">Piket</button><button data-admin-tab="students">Siswa</button><button data-admin-tab="notes">Papan</button><button data-admin-tab="settings">Identitas</button></div><div id="adminContent"></div><button class="logout-btn" id="logoutBtn">Keluar dari panel</button></div></div></div>
-<script src="/app.js"></script></body></html>
+<script src="/app.js"></script>
+  <section style="max-width:1100px;margin:30px auto;padding:0 20px;">
+  <h2 style="color:#a6cbbd;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">Kotak Alat & Permainan Baru</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+    <div style="background:#10191f;border:1px solid #223038;border-radius:12px;padding:18px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">🔢</div>
+      <b style="color:#e8f0ee;font-size:13px;">Tebak Angka</b>
+      <p style="color:#91a19f;font-size:11px;margin:6px 0 12px;">Tebak angka 1-50.</p>
+      <button id="guessStart" style="background:#a6cbbd;color:#0d1b17;border:0;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;">Mulai</button>
+    </div>
+    <div style="background:#10191f;border:1px solid #223038;border-radius:12px;padding:18px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">🧮</div>
+      <b style="color:#e8f0ee;font-size:13px;">Kalkulator</b>
+      <p style="color:#91a19f;font-size:11px;margin:6px 0 12px;">Alat hitung sederhana.</p>
+      <button id="calcStart" style="background:#a6cbbd;color:#0d1b17;border:0;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;">Buka</button>
+    </div>
+    <div style="background:#10191f;border:1px solid #223038;border-radius:12px;padding:18px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">⛅</div>
+      <b style="color:#e8f0ee;font-size:13px;">Cuaca Sekarang</b>
+      <p style="color:#91a19f;font-size:11px;margin:6px 0 12px;">Cek cuaca di lokasimu.</p>
+      <button id="weatherStart" style="background:#a6cbbd;color:#0d1b17;border:0;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;">Cek Cuaca</button>
+    </div>
+    <div style="background:#10191f;border:1px solid #223038;border-radius:12px;padding:18px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">🌍</div>
+      <b style="color:#e8f0ee;font-size:13px;">Info Gempa Terkini</b>
+      <p style="color:#91a19f;font-size:11px;margin:6px 0 12px;">Data gempa terbaru dari BMKG.</p>
+      <button id="quakeStart" style="background:#a6cbbd;color:#0d1b17;border:0;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;">Lihat Info</button>
+    </div>
+  </div>
+  <div class="panel fact-panel" id="factPanel" style="margin-top:16px;">
+    <div class="panel-head"><div><span class="eyebrow">FAKTA SERU</span><h3>Tahukah kamu?</h3></div><span class="small muted" id="factTag">SAINS</span></div>
+    <p id="factText" class="fact-text">Memuat fakta hari ini...</p>
+  </div>
+  </section>
+</body></html>
