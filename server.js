@@ -128,5 +128,22 @@ app.post("/api/notes",admin,(req,res)=>{
 });
 app.delete("/api/notes/:id",admin,(req,res)=>{db.prepare("DELETE FROM notes WHERE id=?").run(req.params.id);res.json({ok:true});});
 app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+app.get("/api/weather", async (req, res) => {
+  const lat = parseFloat(req.query.lat), lon = parseFloat(req.query.lon);
+  if (isNaN(lat) || isNaN(lon)) return res.status(400).json({ error: "Lokasi tidak valid." });
+  try {
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`);
+    const j = await r.json();
+    res.json({ temp: j.current.temperature_2m, humidity: j.current.relative_humidity_2m, wind: j.current.wind_speed_10m, code: j.current.weather_code });
+  } catch (e) { res.status(502).json({ error: "Gagal mengambil data cuaca." }); }
+});
+app.get("/api/gempa", async (req, res) => {
+  try {
+    const r = await fetch("https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json");
+    const j = await r.json();
+    const g = j.Infogempa.gempa;
+    res.json({ tanggal: g.Tanggal, jam: g.Jam, magnitude: g.Magnitude, kedalaman: g.Kedalaman, wilayah: g.Wilayah, potensi: g.Potensi });
+  } catch (e) { res.status(502).json({ error: "Gagal mengambil data gempa terkini." }); }
+});
 app.listen(PORT,()=>console.log(`Kelas 6 Al Baari aktif di port ${PORT}`));
 
